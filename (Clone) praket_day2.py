@@ -46,4 +46,9 @@ df1.write.mode("overwrite").option("path","dbfs:/mnt/praketstorage/raw/json/prak
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC select count(*) from json.bronze
+
+# COMMAND ----------
+
 
