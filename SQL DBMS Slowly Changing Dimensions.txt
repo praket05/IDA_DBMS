@@ -1,0 +1,142 @@
+						SQL DBMS Slowly Changing Dimensions 
+
+
+CREATE TABLE EMPLYOYEE(
+    EmployeeName varchar(255),
+    EmployeeDOB date,
+    EmployeeGender varchar(15),
+    EmployeeLocation varchar(15),
+    EmployeeContact number,
+    PRIMARY KEY (EmployeeContact)
+);
+
+
+--- TYPE 1 SLOWLY CHANGING DIMENSION (SCD) :- Updating Date ---
+drop table D_EMPLYOYEE;
+CREATE TABLE D_EMPLYOYEE(
+    PK_Employee_Key int,
+    E_Contact_number number,
+    E_Name varchar(255),
+    E_DOB date,
+    E_Gender varchar(15),
+    E_Location varchar(15),
+    Created_date timestamp,
+    Updated_date timestamp,
+    PRIMARY KEY (PK_Employee_Key)
+);
+
+
+INSERT INTO EMPLYOYEE (EmployeeName, EmployeeDOB, EmployeeGender, EmployeeLocation, EmployeeContact)
+	VALUES ('Ram Kumar', '01-JAN-1990', 'Male', 'Delhi', 7898528527);
+INSERT INTO EMPLYOYEE (EmployeeName, EmployeeDOB, EmployeeGender, EmployeeLocation, EmployeeContact)
+	VALUES ('Sunita', '02-FEB-1991', 'Female', 'Bangalore', 9517538525);
+INSERT INTO EMPLYOYEE (EmployeeName, EmployeeDOB, EmployeeGender, EmployeeLocation, EmployeeContact)
+	VALUES ('Ajay', '01-JAN-1985', 'Male', 'Bangalore', 9638527415);
+INSERT INTO EMPLYOYEE (EmployeeName, EmployeeDOB, EmployeeGender, EmployeeLocation, EmployeeContact)
+	VALUES ('Nitin', '01-FEB-1985', 'Male', 'Chennai', 8527539515);
+
+select * from emplyoyee;
+
+INSERT INTO D_EMPLYOYEE (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, Created_date, Updated_date)
+VALUES 
+    (1, 7898528527, 'Ram Kumar', '01-JAN-1990', 'Male', 'Delhi', '30-Aug-2023 10:02', '');
+INSERT INTO D_EMPLYOYEE (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, Created_date, Updated_date)
+VALUES 
+    (2, 9517538525, 'Sunita', '02-FEB-1991', 'Female', 'Bangalore', '30-Aug-2023 10:02', '');
+INSERT INTO D_EMPLYOYEE (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, Created_date, Updated_date)
+VALUES 
+    (3, 9638527415, 'Ajay', '01-JAN-1985', 'Male', 'Bangalore', '30-Aug-2023 10:02', '');
+INSERT INTO D_EMPLYOYEE (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, Created_date, Updated_date)
+VALUES 
+    (4, 8527539515, 'Nitin', '01-FEB-1985', 'Male', 'Chennai', '30-Aug-2023 10:02', '');
+
+select * from D_EMPLYOYEE;
+
+
+update emplyoyee set EmployeeLocation='Pune' where EmployeeContact=8527539515;
+select * from emplyoyee;
+
+update d_emplyoyee set E_Location='Pune' where E_Contact_number = 8527539515;
+update d_emplyoyee set Updated_date = (select sysdate from dual) where E_Contact_number = 8527539515;
+select * from D_EMPLYOYEE;
+
+--- TYPE 2 SLOWLY CHANGING DIMENSION (SCD) :- Keeping History of Change (Version) ---
+drop table D_EMPLYOYEE_scd2;
+CREATE TABLE D_EMPLYOYEE_scd2(
+    PK_Employee_Key int,
+    E_Contact_number number,
+    E_Name varchar(255),
+    E_DOB date,
+    E_Gender varchar(15),
+    E_Location varchar(15),
+    start_date timestamp,
+    end_date timestamp,
+    version int,
+    flag varchar(2),
+    PRIMARY KEY (PK_Employee_Key)
+);
+
+INSERT INTO D_EMPLYOYEE_scd2 (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, start_date, end_date, version, flag)
+VALUES 
+    (1, 7898528527, 'Ram Kumar', '01-JAN-1990', 'Male', 'Delhi', '30-Aug-2023 10:02', '', 1, 'Y');
+INSERT INTO D_EMPLYOYEE_scd2 (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, start_date, end_date, version, flag)
+VALUES 
+    (2, 9517538525, 'Sunita', '02-FEB-1991', 'Female', 'Bangalore', '30-Aug-2023 10:02', '', 1, 'Y');
+INSERT INTO D_EMPLYOYEE_scd2 (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, start_date, end_date, version, flag)
+VALUES 
+    (3, 9638527415, 'Ajay', '01-JAN-1985', 'Male', 'Bangalore', '30-Aug-2023 10:02', '', 1, 'Y');
+INSERT INTO D_EMPLYOYEE_scd2 (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, start_date, end_date, version, flag)
+VALUES 
+    (4, 8527539515, 'Nitin', '01-FEB-1985', 'Male', 'Chennai', '30-Aug-2023 10:02', '', 1, 'Y');
+
+update emplyoyee set EmployeeLocation='Hyderabad' where EmployeeContact=9638527415;
+select * from emplyoyee;
+
+select * from D_EMPLYOYEE_scd2;
+
+update d_emplyoyee_scd2 set end_date = (select sysdate from dual), flag = 'N' where E_Contact_number = 9638527415;
+delete from D_EMPLYOYEE_scd2 where PK_Employee_Key = 5;
+INSERT INTO D_EMPLYOYEE_scd2 (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, start_date, end_date, version, flag)
+VALUES 
+    (5, 9638527415, 'Ajay', '01-JAN-1985', 'Male', 'Hyderabad', sysdate, '', 2, 'Y');
+select * from D_EMPLYOYEE_scd2;
+
+
+--- TYPE 3 SLOWLY CHANGING DIMENSION (SCD) :- Keeping History of Change (non-version) ---
+drop table D_EMPLYOYEE_scd3;
+CREATE TABLE D_EMPLYOYEE_scd3(
+    PK_Employee_Key int,
+    E_Contact_number number,
+    E_Name varchar(255),
+    E_DOB date,
+    E_Gender varchar(15),
+    E_Location varchar(15),
+    prev_E_Name varchar(255),
+    prev_E_DOB date,
+    prev_E_Gender varchar(15),
+    prev_E_Location varchar(15),
+    created_date timestamp,
+    updated_date timestamp,
+    PRIMARY KEY (PK_Employee_Key)
+);
+
+INSERT INTO D_EMPLYOYEE_scd3 (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, prev_E_Name, prev_E_DOB, prev_E_Gender, prev_E_Location, created_date, updated_date)
+VALUES 
+    (1, 7898528527, 'Ram Kumar', '01-JAN-1990', 'Male', 'Delhi', null, null, null, null,'30-Aug-2023 10:02', '');
+INSERT INTO D_EMPLYOYEE_scd3 (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, prev_E_Name, prev_E_DOB, prev_E_Gender, prev_E_Location, created_date, updated_date)
+VALUES 
+    (2, 9517538525, 'Sunita', '02-FEB-1991', 'Female', 'Bangalore', null, null, null, null,'30-Aug-2023 10:02', '');
+INSERT INTO D_EMPLYOYEE_scd3 (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, prev_E_Name, prev_E_DOB, prev_E_Gender, prev_E_Location, created_date, updated_date)
+VALUES 
+    (3, 9638527415, 'Ajay', '01-JAN-1985', 'Male', 'Bangalore', null, null, null, null,'30-Aug-2023 10:02', '');
+INSERT INTO D_EMPLYOYEE_scd3 (PK_Employee_Key, E_Contact_number, E_Name, E_DOB, E_Gender, E_Location, prev_E_Name, prev_E_DOB, prev_E_Gender, prev_E_Location, created_date, updated_date)
+VALUES 
+    (4, 8527539515, 'Nitin', '01-FEB-1985', 'Male', 'Chennai', null, null, null, null,'30-Aug-2023 10:02', '');
+
+select * from d_emplyoyee_scd3;
+
+update emplyoyee set EmployeeLocation='BBSR' where EmployeeContact=9638527415;
+select * from emplyoyee;
+
+update d_emplyoyee_scd3 set E_Location = 'BBSR', prev_E_Location = 'Bangalore', updated_date = (select sysdate from dual) where E_Contact_number = 9638527415;
+select * from d_emplyoyee_scd3;

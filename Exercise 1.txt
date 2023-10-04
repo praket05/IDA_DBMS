@@ -1,0 +1,201 @@
+Exercise 1
+ 
+--- Creating Tables ---
+ CREATE TABLE Author (
+ AuthorID INT PRIMARY KEY,
+ FirstName VARCHAR(50),
+ LastName VARCHAR(50),
+ DateOfBirth DATE,
+ Nationality VARCHAR(50)
+);
+
+CREATE TABLE Publisher (
+ PublisherID INT PRIMARY KEY,
+ Name VARCHAR(100),
+ Location VARCHAR(100)
+);
+
+CREATE TABLE Customer (
+ CustomerID INT PRIMARY KEY,
+ FirstName VARCHAR(50),
+ LastName VARCHAR(50),
+ Email VARCHAR(100),
+ PhoneNumber VARCHAR(20),
+ Address VARCHAR(200)
+);
+
+CREATE TABLE Book (
+ ISBN VARCHAR(20) PRIMARY KEY,
+ Title VARCHAR(200),
+ Genre VARCHAR(50),
+ PublicationYear INT,
+ Price DECIMAL(10, 2),
+ PublisherID INT,
+ FOREIGN KEY (PublisherID) REFERENCES Publisher(PublisherID)
+);
+
+CREATE TABLE [Order] (
+ OrderID INT PRIMARY KEY,
+ OrderDate DATE,
+ TotalAmount DECIMAL(10, 2),
+ CustomerID INT,
+ FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
+
+ CREATE TABLE BookAuthor (
+ ISBN VARCHAR(20),
+ AuthorID INT,
+ PRIMARY KEY (ISBN, AuthorID),
+ FOREIGN KEY (ISBN) REFERENCES Book(ISBN),
+ FOREIGN KEY (AuthorID) REFERENCES Author(AuthorID)
+);
+
+CREATE TABLE OrderBook (
+ OrderID INT,
+ ISBN VARCHAR(20),
+ PRIMARY KEY (OrderID, ISBN),
+ FOREIGN KEY (OrderID) REFERENCES [Order](OrderID),
+ FOREIGN KEY (ISBN) REFERENCES Book(ISBN)
+);
+
+--- Inserting Values ---
+INSERT INTO Author (AuthorID, FirstName, LastName, DateOfBirth, Nationality)
+VALUES
+ (1, 'J.K.', 'Rowling', '1965-07-31', 'British'),
+ (2, 'George', 'Orwell', '1903-06-25', 'British');
+
+Select * from Author;
+
+INSERT INTO Publisher (PublisherID, Name, Location)
+VALUES
+ (1, 'Penguin Books', 'London'),
+ (2, 'HarperCollins', 'New York');
+
+ INSERT INTO Customer (CustomerID, FirstName, LastName, Email, PhoneNumber, 
+Address)
+VALUES
+ (1, 'John', 'Doe', 'john.doe@example.com', '123-456-7890', '123 Main St'),
+ (2, 'Jane', 'Smith', 'jane.smith@example.com', '987-654-3210', '456 Elm St');
+
+ INSERT INTO Book (ISBN, Title, Genre, PublicationYear, Price, PublisherID)
+VALUES
+ ('978-0-553-21311-0', 'Harry Potter and the Sorcerer''s Stone', 'Fantasy', 1997, 19.99, 1),
+ ('978-0-452-28423-4', '1984', 'Dystopian', 1949, 12.99, 2);
+
+ INSERT INTO [Order] (OrderID, OrderDate, TotalAmount, CustomerID)
+VALUES
+ (1, '2023-08-01', 33.98, 1),
+ (2, '2023-08-15', 12.99, 2);
+
+ INSERT INTO BookAuthor (ISBN, AuthorID)
+VALUES
+ ('978-0-553-21311-0', 1),
+ ('978-0-452-28423-4', 2);
+
+INSERT INTO OrderBook (OrderID, ISBN)
+VALUES
+ (1, '978-0-553-21311-0'),
+ (2, '978-0-452-28423-4');
+
+--- GRANT keyword usage ---
+GRANT SELECT ON Author TO dbo;
+
+--- REVOKE keyword usage ---
+ REVOKE SELECT ON Author FROM dbo;
+
+--- UPDATE keyword usage -- 
+UPDATE Book SET Price = 24.99 WHERE ISBN = '978-0-553-21311-0';
+Select * from Book;
+
+--- TRUNCATE keywrod usage --- 
+TRUNCATE TABLE OrderBook;
+
+--- FILTERING Data ---
+SELECT * FROM Book WHERE Price > 15.00;
+
+SELECT * FROM Customer WHERE Address LIKE '%Main St%';
+
+--- GROUP BY ---
+SELECT CustomerID, SUM(TotalAmount) AS TotalSales
+FROM [Order]
+GROUP BY CustomerID;
+
+--- Filtering Aggregated Data using HAVING ---
+SELECT CustomerID, SUM(TotalAmount) AS TotalPurchases
+FROM [Order]
+GROUP BY CustomerID
+HAVING SUM(TotalAmount) > 30.00;
+
+--- ORDER BY ---
+SELECT * FROM Book ORDER BY Title;
+
+ SELECT * FROM Customer ORDER BY LastName DESC;
+
+
+
+
+
+
+Test 1 
+
+
+create table students(
+	slno integer primary key,
+	id integer not null, 
+	s_name varchar(16) not null,
+	s_subject varchar(16) not null,
+	s_marks integer
+);
+
+INSERT INTO Students VALUES(1,5030,'Ashley','DWH',50);
+INSERT INTO Students VALUES(2,5031,'Priya','DWH',61);
+INSERT INTO Students VALUES(3,5032,'Julia','DWH',90);
+INSERT INTO Students VALUES(4,5033,'Don','DWH',50);
+INSERT INTO Students VALUES(5,5034,'Bob','DWH',65);
+INSERT INTO Students VALUES(6,5030,'Ashley','SQL',75);
+INSERT INTO Students VALUES(7,5031,'Priya','SQL',80);
+INSERT INTO Students VALUES(8,5032,'Julia','SQL',40);
+INSERT INTO Students VALUES(9,5033,'Don','SQL',88);
+INSERT INTO Students VALUES(10,5034,'Bob','SQL',92);
+INSERT INTO Students VALUES(11,5030,'Ashley','Azure',95);
+INSERT INTO Students VALUES(12,5031,'Priya','Azure',45);
+INSERT INTO Students VALUES(13,5032,'Julia','Azure',85);
+INSERT INTO Students VALUES(14,5033,'Don','Azure',57);
+INSERT INTO Students VALUES(15,5034,'Bob','Azure',44);
+
+
+--- Query 1 ---
+select s1.s_name, s1.s_subject, s1.s_marks from students s1 
+join 
+(select s_subject, max(s_marks) as max_marks from students group by s_subject) s2 
+on (s1.s_subject = s2.s_subject and s1.s_marks = max_marks);
+
+--- Query 2 ---
+select * from students order by s_subject asc, s_marks desc;
+
+--- Query 3 ---
+select * from students where s_marks<50;
+
+--- Query 4 ---
+select * from students where s_subject = 'Azure' order by s_marks desc;
+
+--- Query 5 ---
+select s_name, sum(s_marks) from students group by s_name;
+
+--- Query 6 ---
+select s_name, sum(s_marks) from students group by s_name order by sum(s_marks);
+
+--- Query 7 ---
+select s_subject, sum(s_marks) from students group by s_subject order by sum(s_marks);
+
+--- Query 8 ---
+
+
+--- Query 9 ---
+select s1.s_name, s1.s_subject, s1.s_marks, s2.max_marks from students s1 
+join 
+(select s_subject, max(s_marks) as max_marks from students group by s_subject) s2 
+on (s1.s_subject = s2.s_subject);
+
+--- Query 10 ---
+select *, (left(s_name,3) + right(id,2) + '@ta.com') as email from students;

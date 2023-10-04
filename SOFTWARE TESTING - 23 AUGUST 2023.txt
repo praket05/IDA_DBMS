@@ -1,0 +1,113 @@
+SOFTWARE TESTING - 23 AUGUST 2023
+
+
+Why do products fail even after testing?
+
+Ans - constant change in environment/technology, updating demands,requirements, 
+
+
+
+
+Requirement analysis <-----------------------------> System testing
+	     \						/
+	high level design<------------------->Integration testing
+		      \				/
+		low level design<-------->Unit testing
+				\        /
+				  coding
+
+
+------------------------------------------------------------------------------------------------------
+PHASES OF STLC (SOFTWARE TESTING LIFE CYCLE) :
+
+
+test strat -> identifying the strength and weakness. Make everything fail. identify types of test.
+    |
+test plan -> who does what. manual or automation testing. what softwares used for testing
+    |
+test design -> how are you going to write the test case. Test inputs, execution conditions, expected results.
+    |
+test environment -> where to execute the test case. Platform version, which OS, etc.
+    |
+test execution -> conducting the tests. test incident reports, test log, testing status and results. Then categorise the defects.
+   | |
+defect reporting -> categorising to minor or major defect and then prioritise the defects accordingly and give back to developers
+    |
+test closure 
+
+--------------------------------------------------------------------------------------------------------
+Design a test case for :
+Select a product -> ADD TO CART FEATURE IN A E-COMMERCE WEBSITE
+
+Steps to test a test case - 
+
+Test id 
+
+if the product is getting updated in the cart.
+navigation
+the icon of cart is getting updated.
+total cost of cart is correct.
+no negative qty option.
+price updation according to qty
+
+
+strat -> Performance testing, functional testing, usability, accesibility, 
+plan -> 
+
+ Test id          Test data         Steps to test       Expected output         Actual Output
+
+
+--------------------------------------------------------------------------------------------------------
+
+Terms :-
+defect, 
+  deviation from requirement
+
+bug, 
+  Not working as per requirement.
+  faults in system/app
+  
+failure, 
+  if defects in the software are tested by tester  
+
+error
+  developer fails to understand the requirement.
+
+--------------------------------------------------------------------------------------------------------
+
+TDD - Test Driven Develpoment
+
+ATDD - Acceptance TDD
+
+BDD - Behavioral Driven Development
+
+DDD -  
+
+
+--------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
